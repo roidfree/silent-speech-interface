@@ -1,0 +1,5 @@
+source_dir,word,session_token,reason
+data/bye/s3,bye,s3,"corrupt channel file bye_CNC_s3_ch3.npy: Failed to read all data for array. Expected (1, 375400) = 375400 elements, could only read 502 elements. (file seems not fully written?)"
+data/bye/s4,bye,s4,corrupt channel file bye_CNC_s4_ch1.npy: No data left in file
+data/yes/yes_s1 (empty cuz recordings are dogshi),yes,s1,"missing channel(s): 1, 2, 3, 4, 5, 6, 7, 8"
+data/yes/yes_s7,yes,s7,missing channel(s): 4

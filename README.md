@@ -1,49 +1,63 @@
-# EMG Yes/No Classifier
+# Silent Speech Interface
 
-Small scaffold for an EMG-based binary classifier ("yes" vs "no").
+This repo now contains a v1 that follows JJ's preprocessing pipeline for the
+multichannel silent-speech dataset stored in `data/` (stored locally).
 
-Project layout
+## Current workflow
 
-```
-emg-yes-no-classifier/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── data/
-│   ├── raw/
-│   │   ├── yes/
-│   │   └── no/
-│   └── processed/
-│       └── (your .mat files go here after export)
-├── notebooks/
-│   ├── 01_data_exploration.ipynb
-│   └── 02_model_training.ipynb
-├── src/
-│   ├── __init__.py
-│   ├── data_loader.py
-│   ├── preprocessing.py
-│   ├── model.py
-│   └── train.py
-├── results/
-│   ├── plots/
-│   └── models/
-└── tests/
+```text
+data/                  # untouched source .npy files
+processed/
+  blocks/              # clean 8-channel continuous blocks
+  trials/              # segmented 8-channel trials
+  features/            # reserved for optional model-ready exports
+metadata/
+  blocks.csv
+  trials.csv
+  features.csv
+  quarantine_blocks.csv
+splits/
+  by_block.json
+  by_session.json
+src/
+  preprocessing/
+    preprocessing.py   # Jayla's similar filtering + detection
+    pipeline.py        # end-to-end dataset conversion
+  data_loader.py       # feature/split loading
+  model.py             # XGBoost model factory
+  train.py             # model training entrypoint
 ```
 
-Quick start
+## Preprocessing truth
 
-1. Create a Python virtual environment:
+The operational preprocessing and segmentation logic mirrors Jayla's code:
+
+- DC removal
+- 50 Hz notch, Q=30
+- 20-450 Hz 4th-order Butterworth bandpass
+- 40 ms RMS window, 20 ms hop
+- smoothed RMS thresholding with Jayla's exact decay and merge rules
+- per-channel activity masks fused with `active_channels >= 2`
+
+## Commands
+
+Create the processed dataset:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+./.venv/bin/python -m src.preprocessing.pipeline
 ```
 
-2. Place your exported `.mat` files into `data/processed/` (organized or labelled as you prefer).
-3. Run `src/train.py` to run a minimal training script (example in the file).
+Train the first-pass model:
 
-Notes
+```bash
+./.venv/bin/python -m src.train \
+  --features-csv metadata/features.csv \
+  --split-path splits/by_session.json \
+  --save-path results/models/xgboost.joblib
+```
 
-- The scaffold includes minimal helper modules for loading .mat files, preprocessing, and creating a simple scikit-learn classifier.
-- Extend preprocessing and model definitions to match your dataset and goals.
+## Notes
+
+- Dodgy blocks have been quarantined and are listed in `metadata/quarantine_blocks.csv`.
+- `by_session.json` is the default leakage-safe split for evaluation.
+- `xgboost` is required for training and must be installed in the environment.

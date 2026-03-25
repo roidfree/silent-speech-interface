@@ -17,6 +17,10 @@ venv/
 # Results and models
 results/models/
 
+# Large local datasets
+data/
+SSI-jayla/
+
 # Mat files maybe large
 *.mat
 
