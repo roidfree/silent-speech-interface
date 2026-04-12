@@ -1,0 +1,11 @@
+trial_id,block_id,recording_id,electrode,word,session_token,trial_file,start_sample,end_sample,length_samples
+trial_000001,block_000001,pedot:bye:s1,pedot,bye,s1,processed/pedot/operational/trials/trial_000001.npy,16960,448160,431200
+trial_000002,block_000002,pedot:help:s1,pedot,help,s1,processed/pedot/operational/trials/trial_000002.npy,16960,655560,638600
+trial_000003,block_000003,pedot:no:s1,pedot,no,s1,processed/pedot/operational/trials/trial_000003.npy,16960,662560,645600
+trial_000004,block_000004,pedot:pain:s1,pedot,pain,s1,processed/pedot/operational/trials/trial_000004.npy,16960,593760,576800
+trial_000005,block_000005,pedot:wait:s1,pedot,wait,s1,processed/pedot/operational/trials/trial_000005.npy,16960,684160,667200
+trial_000006,block_000006,pedot:yes:s1,pedot,yes,s1,processed/pedot/operational/trials/trial_000006.npy,16960,297560,280600
+trial_000007,block_000007,pedot:yes:s2,pedot,yes,s2,processed/pedot/operational/trials/trial_000007.npy,16960,301360,284400
+trial_000008,block_000008,pedot:yes:s3,pedot,yes,s3,processed/pedot/operational/trials/trial_000008.npy,16960,656360,639400
+trial_000009,block_000009,pedot:yes:s4,pedot,yes,s4,processed/pedot/operational/trials/trial_000009.npy,16960,668360,651400
+trial_000010,block_000010,pedot:yes:s6,pedot,yes,s6,processed/pedot/operational/trials/trial_000010.npy,16960,665160,648200

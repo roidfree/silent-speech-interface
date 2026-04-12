@@ -1,0 +1,6 @@
+split,session_token,n_examples,accuracy
+train,s1,6,0.3333333333333333
+train,s2,1,1.0
+train,s3,1,1.0
+val,s4,1,1.0
+test,s6,1,1.0

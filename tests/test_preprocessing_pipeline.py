@@ -36,7 +36,7 @@ def _load_jayla_module(module_name: str, relative_path: str):
 
 def test_preprocessor_matches_jayla_code():
     jayla_preprocess_module = _load_jayla_module("jayla_preprocess2", "SSI-jayla/src/preprocess2.py")
-    raw = np.load(ROOT / "data" / "bye" / "s1" / "bye_CNC_s1_ch1.npy").squeeze().astype(float)
+    raw = np.load(ROOT / "data" / "AgAgCl" / "bye" / "s1" / "bye_CNC_s1_ch1.npy").squeeze().astype(float)
 
     ours = JaylaPreprocessor().process(raw)
     theirs = jayla_preprocess_module.EMGPreprocessor2().process_signal(raw)["filtered"]
@@ -46,7 +46,7 @@ def test_preprocessor_matches_jayla_code():
 
 def test_detector_matches_jayla_code():
     jayla_detector_module = _load_jayla_module("jayla_detector", "SSI-jayla/src/speech_detection.py")
-    raw = np.load(ROOT / "data" / "bye" / "s1" / "bye_CNC_s1_ch1.npy").squeeze().astype(float)
+    raw = np.load(ROOT / "data" / "AgAgCl" / "bye" / "s1" / "bye_CNC_s1_ch1.npy").squeeze().astype(float)
 
     ours = JaylaDetector().detect(raw, return_metadata=True)
     theirs = jayla_detector_module.SpeechActivityDetector(method="spc").detect(raw, return_metadata=True)
@@ -58,7 +58,7 @@ def test_detector_matches_jayla_code():
 
 
 def test_load_block_stacks_eight_channels():
-    record = BlockRecord(word="bye", source_dir=ROOT / "data" / "bye" / "s1", session_token="s1")
+    record = BlockRecord(word="bye", source_dir=ROOT / "data" / "AgAgCl" / "bye" / "s1", session_token="s1")
     block, error = load_block(record)
     assert error is None
     assert block is not None
@@ -66,7 +66,7 @@ def test_load_block_stacks_eight_channels():
 
 
 def test_load_block_quarantines_missing_or_corrupt_channels():
-    record = BlockRecord(word="bye", source_dir=ROOT / "data" / "bye" / "s4", session_token="s4")
+    record = BlockRecord(word="bye", source_dir=ROOT / "data" / "AgAgCl" / "bye" / "s4", session_token="s4")
     block, error = load_block(record)
     assert block is None
     assert error is not None

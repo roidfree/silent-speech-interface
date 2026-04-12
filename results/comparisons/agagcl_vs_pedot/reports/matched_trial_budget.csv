@@ -1,0 +1,5 @@
+split,word,session_token,trial_budget,agagcl_available_trials,pedot_available_trials
+train,bye,s1,1,45,1
+train,help,s1,1,44,1
+train,no,s1,1,29,1
+train,wait,s1,1,22,1

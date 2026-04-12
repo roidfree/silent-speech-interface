@@ -1,0 +1,12 @@
+recording_id,electrode,word,session_token,label_token,channel_count,available_channels,valid_channels,sample_count_min,sample_count_max,has_length_mismatch,suspicious_channel_count,load_error_count,qc_status,is_usable
+pedot:bye:s1,pedot,bye,s1,CE,7,"2,3,4,5,6,7,8","2,3,4,5,6,7,8",528000,528000,False,0,0,ok,True
+pedot:help:s1,pedot,help,s1,CE,7,"2,3,4,5,6,7,8","2,3,4,5,6,7,8",735400,735400,False,0,0,ok,True
+pedot:no:s1,pedot,no,s1,CE,6,"2,3,4,5,7,8","2,3,4,5,7,8",742400,742400,False,0,0,ok,True
+pedot:pain:s1,pedot,pain,s1,CE,6,"2,3,4,5,7,8","2,3,4,5,7,8",673600,673600,False,0,0,ok,True
+pedot:wait:s1,pedot,wait,s1,CE,6,"2,3,4,5,7,8","2,3,4,5,7,8",764000,764000,False,0,0,ok,True
+pedot:yes:s1,pedot,yes,s1,CE,7,"2,3,4,5,6,7,8","2,3,4,5,6,7,8",377400,377400,False,0,0,ok,True
+pedot:yes:s2,pedot,yes,s2,CE,7,"2,3,4,5,6,7,8","2,3,4,5,6,7,8",381200,381200,False,0,0,ok,True
+pedot:yes:s3,pedot,yes,s3,CE,7,"2,3,4,5,6,7,8","2,3,4,5,6,7,8",736200,736200,False,0,0,ok,True
+pedot:yes:s4,pedot,yes,s4,CE,7,"2,3,4,5,6,7,8","2,3,4,5,6,7,8",748200,748200,False,0,0,ok,True
+pedot:yes:s5,pedot,yes,s5,CE,7,"2,3,4,5,6,7,28","2,3,4,5,6,7",755000,755000,False,1,1,suspicious_channels;channel_qc_failures,False
+pedot:yes:s6,pedot,yes,s6,CE,7,"2,3,4,5,6,7,8","2,3,4,5,6,7,8",745000,745000,False,0,0,ok,True

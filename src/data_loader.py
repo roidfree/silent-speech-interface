@@ -10,7 +10,7 @@ import pandas as pd
 from . import config
 
 
-METADATA_COLUMNS = {"trial_id", "block_id", "word", "session_token"}
+METADATA_COLUMNS = {"trial_id", "block_id", "recording_id", "electrode", "word", "session_token"}
 
 
 def load_feature_table(features_csv: str | Path = config.FEATURES_METADATA_PATH) -> pd.DataFrame:
@@ -41,3 +41,14 @@ def load_training_data(
     X = subset.drop(columns=sorted(METADATA_COLUMNS))
     y = subset["word"].copy()
     return X, y
+
+
+def load_split_subset(
+    features_csv: str | Path,
+    split_path: str | Path,
+    split_name: str,
+) -> pd.DataFrame:
+    """Load the full feature subset for a named split."""
+    features = load_feature_table(features_csv)
+    trial_ids = set(load_split_trial_ids(split_path, split_name))
+    return features[features["trial_id"].isin(trial_ids)].copy()

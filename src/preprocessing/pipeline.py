@@ -1,4 +1,4 @@
-"""End-to-end conversion pipeline for the v1 silent-speech dataset."""
+"""End-to-end conversion pipeline for electrode-aware silent-speech datasets."""
 
 from __future__ import annotations
 
@@ -15,6 +15,13 @@ import numpy as np
 import pandas as pd
 
 from .. import config
+from ..recordings import (
+    build_recording_manifest,
+    derive_stable_channel_subset,
+    filter_summary_for_channels,
+    load_block_from_manifest_rows,
+    summarize_recordings,
+)
 from .preprocessing import JaylaConfig, JaylaDetector, extract_features, segment_multichannel_block
 
 
@@ -49,20 +56,8 @@ def _channel_number(path: Path) -> str | None:
     return match.group(1) if match else None
 
 
-def _clean_output_dirs() -> None:
-    for directory, prefix in (
-        (config.PROCESSED_BLOCKS_DIR, "block_"),
-        (config.PROCESSED_TRIALS_DIR, "trial_"),
-    ):
-        directory.mkdir(parents=True, exist_ok=True)
-        for path in directory.glob(f"{prefix}*.npy"):
-            path.unlink()
-    config.PROCESSED_FEATURES_DIR.mkdir(parents=True, exist_ok=True)
-    config.METADATA_DIR.mkdir(parents=True, exist_ok=True)
-    config.SPLITS_DIR.mkdir(parents=True, exist_ok=True)
-
-
 def load_block(record: BlockRecord) -> tuple[np.ndarray | None, str | None]:
+    """Legacy loader kept for Ag/AgCl compatibility tests."""
     channels: dict[str, np.ndarray] = {}
     channel_lengths: set[int] = set()
 
@@ -122,11 +117,7 @@ def assign_label_balanced_group_splits(
     label_column: str,
     seed: int,
 ) -> dict[str, list[str]]:
-    """Search for a group split that preserves label coverage across splits.
-
-    This is used for low-cardinality grouped splits such as `session_token`,
-    where pure random assignment can easily drop an entire class from a split.
-    """
+    """Search for a group split that preserves label coverage across splits."""
     groups = sorted(trials_df[group_column].unique().tolist())
     n_train, n_val, n_test = _resolve_group_split_counts(len(groups))
     if len(groups) > 12:
@@ -203,8 +194,81 @@ def materialize_trial_splits(
     return payload
 
 
-def run_pipeline(raw_root: Path = config.RAW_DATA_DIR) -> dict[str, int]:
-    _clean_output_dirs()
+def _clean_output_dirs(namespace: str) -> None:
+    for directory, prefix in (
+        (config.get_processed_blocks_dir(namespace), "block_"),
+        (config.get_processed_trials_dir(namespace), "trial_"),
+    ):
+        directory.mkdir(parents=True, exist_ok=True)
+        for path in directory.glob(f"{prefix}*.npy"):
+            path.unlink()
+    config.get_processed_features_dir(namespace).mkdir(parents=True, exist_ok=True)
+    config.get_metadata_dir(namespace).mkdir(parents=True, exist_ok=True)
+    config.get_splits_dir(namespace).mkdir(parents=True, exist_ok=True)
+
+
+def _save_pipeline_outputs(
+    namespace: str,
+    manifest_df: pd.DataFrame,
+    summary_df: pd.DataFrame,
+    blocks_df: pd.DataFrame,
+    trials_df: pd.DataFrame,
+    features_df: pd.DataFrame,
+    quarantine_df: pd.DataFrame,
+) -> None:
+    config.get_metadata_dir(namespace).mkdir(parents=True, exist_ok=True)
+    manifest_df.to_csv(config.get_manifest_metadata_path(namespace), index=False)
+    summary_df.to_csv(config.get_recording_summary_path(namespace), index=False)
+    blocks_df.to_csv(config.get_blocks_metadata_path(namespace), index=False)
+    trials_df.to_csv(config.get_trials_metadata_path(namespace), index=False)
+    features_df.to_csv(config.get_features_metadata_path(namespace), index=False)
+    quarantine_df.to_csv(config.get_quarantine_metadata_path(namespace), index=False)
+
+
+def run_pipeline(
+    electrode: str = config.DEFAULT_ELECTRODE,
+    data_dir: str | Path | None = None,
+    namespace: str | None = None,
+    manifest_df: pd.DataFrame | None = None,
+    allowed_channels: tuple[str, ...] | list[str] | None = None,
+    selected_recording_ids: set[str] | None = None,
+) -> dict[str, object]:
+    electrode_name = config.normalize_electrode_name(electrode)
+    namespace = namespace or electrode_name
+    _clean_output_dirs(namespace)
+
+    manifest = manifest_df.copy() if manifest_df is not None else build_recording_manifest(electrode_name, data_dir=data_dir)
+    if manifest.empty:
+        summary_df = summarize_recordings(manifest)
+        _save_pipeline_outputs(
+            namespace,
+            manifest,
+            summary_df,
+            pd.DataFrame(),
+            pd.DataFrame(),
+            pd.DataFrame(),
+            pd.DataFrame(),
+        )
+        for split_path in (config.get_by_block_split_path(namespace), config.get_by_session_split_path(namespace)):
+            split_path.parent.mkdir(parents=True, exist_ok=True)
+            with split_path.open("w") as fh:
+                json.dump({"train": [], "val": [], "test": []}, fh, indent=2)
+        return {
+            "electrode": electrode_name,
+            "namespace": namespace,
+            "allowed_channels": (),
+            "processed_blocks": 0,
+            "processed_trials": 0,
+            "quarantined_blocks": 0,
+            "feature_rows": 0,
+            "selected_recordings": 0,
+        }
+
+    summary_df = summarize_recordings(manifest)
+    channel_subset = tuple(str(channel) for channel in (allowed_channels or derive_stable_channel_subset(summary_df)))
+    filtered_summary = filter_summary_for_channels(summary_df, channel_subset)
+    if selected_recording_ids is not None:
+        filtered_summary = filtered_summary[filtered_summary["recording_id"].isin(selected_recording_ids)].reset_index(drop=True)
 
     detector = JaylaDetector(JaylaConfig())
     blocks_rows: list[dict[str, object]] = []
@@ -212,34 +276,42 @@ def run_pipeline(raw_root: Path = config.RAW_DATA_DIR) -> dict[str, int]:
     features_rows: list[dict[str, object]] = []
     quarantine_rows: list[dict[str, object]] = []
 
+    blocks_dir = config.get_processed_blocks_dir(namespace)
+    trials_dir = config.get_processed_trials_dir(namespace)
     block_index = 0
     trial_index = 0
 
-    for record in iter_block_dirs(raw_root):
+    manifest_groups = {recording_id: group for recording_id, group in manifest.groupby("recording_id", sort=True)}
+
+    for _, summary_row in filtered_summary.sort_values(["word", "session_token"]).iterrows():
+        recording_id = str(summary_row["recording_id"])
         block_index += 1
         block_id = f"block_{block_index:06d}"
-        block, error = load_block(record)
+        block, error = load_block_from_manifest_rows(manifest_groups[recording_id], channel_subset)
         if error is not None or block is None:
             quarantine_rows.append(
                 {
-                    "source_dir": str(record.source_dir.relative_to(config.PROJECT_ROOT)),
-                    "word": record.word,
-                    "session_token": record.session_token,
+                    "recording_id": recording_id,
+                    "electrode": electrode_name,
+                    "word": summary_row["word"],
+                    "session_token": summary_row["session_token"],
                     "reason": error or "unknown error",
                 }
             )
             continue
 
-        block_file = config.PROCESSED_BLOCKS_DIR / f"{block_id}.npy"
+        block_file = blocks_dir / f"{block_id}.npy"
         np.save(block_file, block)
         blocks_rows.append(
             {
                 "block_id": block_id,
-                "word": record.word,
-                "session_token": record.session_token,
-                "source_dir": str(record.source_dir.relative_to(config.PROJECT_ROOT)),
+                "recording_id": recording_id,
+                "electrode": electrode_name,
+                "word": summary_row["word"],
+                "session_token": summary_row["session_token"],
                 "block_file": str(block_file.relative_to(config.PROJECT_ROOT)),
                 "channel_count": int(block.shape[0]),
+                "channel_ids": ",".join(channel_subset),
                 "length_samples": int(block.shape[1]),
                 "sample_rate": config.SAMPLING_RATE,
                 "status": "processed",
@@ -256,15 +328,17 @@ def run_pipeline(raw_root: Path = config.RAW_DATA_DIR) -> dict[str, int]:
             trial_index += 1
             trial_id = f"trial_{trial_index:06d}"
             trial = block[:, onset:offset]
-            trial_file = config.PROCESSED_TRIALS_DIR / f"{trial_id}.npy"
+            trial_file = trials_dir / f"{trial_id}.npy"
             np.save(trial_file, trial)
 
             trials_rows.append(
                 {
                     "trial_id": trial_id,
                     "block_id": block_id,
-                    "word": record.word,
-                    "session_token": record.session_token,
+                    "recording_id": recording_id,
+                    "electrode": electrode_name,
+                    "word": summary_row["word"],
+                    "session_token": summary_row["session_token"],
                     "trial_file": str(trial_file.relative_to(config.PROJECT_ROOT)),
                     "start_sample": onset,
                     "end_sample": offset,
@@ -275,8 +349,10 @@ def run_pipeline(raw_root: Path = config.RAW_DATA_DIR) -> dict[str, int]:
             feature_row = {
                 "trial_id": trial_id,
                 "block_id": block_id,
-                "word": record.word,
-                "session_token": record.session_token,
+                "recording_id": recording_id,
+                "electrode": electrode_name,
+                "word": summary_row["word"],
+                "session_token": summary_row["session_token"],
             }
             feature_row.update(extract_features(trial))
             features_rows.append(feature_row)
@@ -286,10 +362,7 @@ def run_pipeline(raw_root: Path = config.RAW_DATA_DIR) -> dict[str, int]:
     features_df = pd.DataFrame(features_rows)
     quarantine_df = pd.DataFrame(quarantine_rows)
 
-    blocks_df.to_csv(config.BLOCKS_METADATA_PATH, index=False)
-    trials_df.to_csv(config.TRIALS_METADATA_PATH, index=False)
-    features_df.to_csv(config.FEATURES_METADATA_PATH, index=False)
-    quarantine_df.to_csv(config.QUARANTINE_METADATA_PATH, index=False)
+    _save_pipeline_outputs(namespace, manifest, summary_df, blocks_df, trials_df, features_df, quarantine_df)
 
     if not trials_df.empty:
         by_block = materialize_trial_splits(trials_df, "block_id", seed=config.SPLIT_SEED)
@@ -303,24 +376,38 @@ def run_pipeline(raw_root: Path = config.RAW_DATA_DIR) -> dict[str, int]:
         by_block = {"train": [], "val": [], "test": []}
         by_session = {"train": [], "val": [], "test": []}
 
-    with config.BY_BLOCK_SPLIT_PATH.open("w") as fh:
+    with config.get_by_block_split_path(namespace).open("w") as fh:
         json.dump(by_block, fh, indent=2)
-    with config.BY_SESSION_SPLIT_PATH.open("w") as fh:
+    with config.get_by_session_split_path(namespace).open("w") as fh:
         json.dump(by_session, fh, indent=2)
 
     return {
+        "electrode": electrode_name,
+        "namespace": namespace,
+        "allowed_channels": channel_subset,
         "processed_blocks": len(blocks_df),
         "processed_trials": len(trials_df),
         "quarantined_blocks": len(quarantine_df),
         "feature_rows": len(features_df),
+        "selected_recordings": len(filtered_summary),
     }
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-dir", default=str(config.RAW_DATA_DIR))
+    parser.add_argument("--electrode", default=config.DEFAULT_ELECTRODE)
+    parser.add_argument("--data-dir", default=None)
+    parser.add_argument("--namespace", default=None)
+    parser.add_argument("--channels", default=None, help="Comma-separated channel ids to force")
     args = parser.parse_args()
-    summary = run_pipeline(Path(args.data_dir))
+
+    channels = tuple(part.strip() for part in args.channels.split(",") if part.strip()) if args.channels else None
+    summary = run_pipeline(
+        electrode=args.electrode,
+        data_dir=args.data_dir,
+        namespace=args.namespace,
+        allowed_channels=channels,
+    )
     for key, value in summary.items():
         print(f"{key}: {value}")
 

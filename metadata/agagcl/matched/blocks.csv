@@ -1,0 +1,5 @@
+block_id,recording_id,electrode,word,session_token,block_file,channel_count,channel_ids,length_samples,sample_rate,status
+block_000001,agagcl:bye:s1,agagcl,bye,s1,processed/agagcl/matched/blocks/block_000001.npy,6,"2,3,4,5,7,8",379000,2000,processed
+block_000002,agagcl:help:s1,agagcl,help,s1,processed/agagcl/matched/blocks/block_000002.npy,6,"2,3,4,5,7,8",375800,2000,processed
+block_000003,agagcl:no:s1,agagcl,no,s1,processed/agagcl/matched/blocks/block_000003.npy,6,"2,3,4,5,7,8",383800,2000,processed
+block_000004,agagcl:wait:s1,agagcl,wait,s1,processed/agagcl/matched/blocks/block_000004.npy,6,"2,3,4,5,7,8",377800,2000,processed

@@ -1,0 +1,5 @@
+trial_id,block_id,recording_id,electrode,word,session_token,trial_file,start_sample,end_sample,length_samples
+trial_000001,block_000001,pedot:bye:s1,pedot,bye,s1,processed/pedot/matched/trials/trial_000001.npy,16960,448160,431200
+trial_000002,block_000002,pedot:help:s1,pedot,help,s1,processed/pedot/matched/trials/trial_000002.npy,16960,655560,638600
+trial_000003,block_000003,pedot:no:s1,pedot,no,s1,processed/pedot/matched/trials/trial_000003.npy,16960,662560,645600
+trial_000004,block_000004,pedot:wait:s1,pedot,wait,s1,processed/pedot/matched/trials/trial_000004.npy,16960,684160,667200

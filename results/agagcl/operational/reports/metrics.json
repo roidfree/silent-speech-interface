@@ -1,0 +1,178 @@
+{
+  "val": {
+    "split": "val",
+    "accuracy": 0.96875,
+    "macro_f1": 0.9651757536241122,
+    "classification_report": {
+      "bye": {
+        "precision": 0.9555555555555556,
+        "recall": 0.9555555555555556,
+        "f1-score": 0.9555555555555556,
+        "support": 45.0
+      },
+      "help": {
+        "precision": 0.8958333333333334,
+        "recall": 0.9772727272727273,
+        "f1-score": 0.9347826086956522,
+        "support": 44.0
+      },
+      "no": {
+        "precision": 0.9555555555555556,
+        "recall": 0.9555555555555556,
+        "f1-score": 0.9555555555555556,
+        "support": 45.0
+      },
+      "pain": {
+        "precision": 1.0,
+        "recall": 0.927710843373494,
+        "f1-score": 0.9625,
+        "support": 83.0
+      },
+      "wait": {
+        "precision": 0.9761904761904762,
+        "recall": 1.0,
+        "f1-score": 0.9879518072289156,
+        "support": 41.0
+      },
+      "yes": {
+        "precision": 0.9894736842105263,
+        "recall": 1.0,
+        "f1-score": 0.9947089947089947,
+        "support": 94.0
+      },
+      "accuracy": 0.96875,
+      "macro avg": {
+        "precision": 0.9621014341409078,
+        "recall": 0.9693491136262221,
+        "f1-score": 0.9651757536241122,
+        "support": 352.0
+      },
+      "weighted avg": {
+        "precision": 0.970031257120073,
+        "recall": 0.96875,
+        "f1-score": 0.9688255806296582,
+        "support": 352.0
+      }
+    },
+    "classification_report_text": "              precision    recall  f1-score   support\n\n         bye       0.96      0.96      0.96        45\n        help       0.90      0.98      0.93        44\n          no       0.96      0.96      0.96        45\n        pain       1.00      0.93      0.96        83\n        wait       0.98      1.00      0.99        41\n         yes       0.99      1.00      0.99        94\n\n    accuracy                           0.97       352\n   macro avg       0.96      0.97      0.97       352\nweighted avg       0.97      0.97      0.97       352\n",
+    "confusion_matrix": [
+      [
+        43,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        43,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        43,
+        0,
+        1,
+        0
+      ],
+      [
+        2,
+        2,
+        1,
+        77,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        41,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        94
+      ]
+    ],
+    "labels": [
+      "bye",
+      "help",
+      "no",
+      "pain",
+      "wait",
+      "yes"
+    ],
+    "n_examples": 352
+  },
+  "test": {
+    "split": "test",
+    "accuracy": 0.9555555555555556,
+    "macro_f1": 0.4851438262631602,
+    "classification_report": {
+      "help": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 0.0
+      },
+      "no": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 0.0
+      },
+      "pain": {
+        "precision": 1.0,
+        "recall": 0.9448275862068966,
+        "f1-score": 0.9716312056737588,
+        "support": 145.0
+      },
+      "yes": {
+        "precision": 0.9629629629629629,
+        "recall": 0.975,
+        "f1-score": 0.968944099378882,
+        "support": 80.0
+      },
+      "accuracy": 0.9555555555555556,
+      "macro avg": {
+        "precision": 0.4907407407407407,
+        "recall": 0.47995689655172413,
+        "f1-score": 0.4851438262631602,
+        "support": 225.0
+      },
+      "weighted avg": {
+        "precision": 0.9868312757201646,
+        "recall": 0.9555555555555556,
+        "f1-score": 0.9706757901022471,
+        "support": 225.0
+      }
+    },
+    "classification_report_text": "              precision    recall  f1-score   support\n\n        help       0.00      0.00      0.00         0\n          no       0.00      0.00      0.00         0\n        pain       1.00      0.94      0.97       145\n         yes       0.96      0.97      0.97        80\n\n    accuracy                           0.96       225\n   macro avg       0.49      0.48      0.49       225\nweighted avg       0.99      0.96      0.97       225\n",
+    "confusion_matrix": [
+      [
+        137,
+        3
+      ],
+      [
+        0,
+        78
+      ]
+    ],
+    "labels": [
+      "pain",
+      "yes"
+    ],
+    "n_examples": 225
+  }
+}

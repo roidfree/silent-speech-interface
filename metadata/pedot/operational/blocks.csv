@@ -1,0 +1,11 @@
+block_id,recording_id,electrode,word,session_token,block_file,channel_count,channel_ids,length_samples,sample_rate,status
+block_000001,pedot:bye:s1,pedot,bye,s1,processed/pedot/operational/blocks/block_000001.npy,6,"2,3,4,5,7,8",528000,2000,processed
+block_000002,pedot:help:s1,pedot,help,s1,processed/pedot/operational/blocks/block_000002.npy,6,"2,3,4,5,7,8",735400,2000,processed
+block_000003,pedot:no:s1,pedot,no,s1,processed/pedot/operational/blocks/block_000003.npy,6,"2,3,4,5,7,8",742400,2000,processed
+block_000004,pedot:pain:s1,pedot,pain,s1,processed/pedot/operational/blocks/block_000004.npy,6,"2,3,4,5,7,8",673600,2000,processed
+block_000005,pedot:wait:s1,pedot,wait,s1,processed/pedot/operational/blocks/block_000005.npy,6,"2,3,4,5,7,8",764000,2000,processed
+block_000006,pedot:yes:s1,pedot,yes,s1,processed/pedot/operational/blocks/block_000006.npy,6,"2,3,4,5,7,8",377400,2000,processed
+block_000007,pedot:yes:s2,pedot,yes,s2,processed/pedot/operational/blocks/block_000007.npy,6,"2,3,4,5,7,8",381200,2000,processed
+block_000008,pedot:yes:s3,pedot,yes,s3,processed/pedot/operational/blocks/block_000008.npy,6,"2,3,4,5,7,8",736200,2000,processed
+block_000009,pedot:yes:s4,pedot,yes,s4,processed/pedot/operational/blocks/block_000009.npy,6,"2,3,4,5,7,8",748200,2000,processed
+block_000010,pedot:yes:s6,pedot,yes,s6,processed/pedot/operational/blocks/block_000010.npy,6,"2,3,4,5,7,8",745000,2000,processed

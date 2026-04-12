@@ -1,0 +1,74 @@
+{
+  "val": {
+    "split": "val",
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "classification_report": {
+      "yes": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 1.0
+      },
+      "accuracy": 1.0,
+      "macro avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 1.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 1.0
+      }
+    },
+    "classification_report_text": "              precision    recall  f1-score   support\n\n         yes       1.00      1.00      1.00         1\n\n    accuracy                           1.00         1\n   macro avg       1.00      1.00      1.00         1\nweighted avg       1.00      1.00      1.00         1\n",
+    "confusion_matrix": [
+      [
+        1
+      ]
+    ],
+    "labels": [
+      "yes"
+    ],
+    "n_examples": 1
+  },
+  "test": {
+    "split": "test",
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "classification_report": {
+      "yes": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 1.0
+      },
+      "accuracy": 1.0,
+      "macro avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 1.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 1.0
+      }
+    },
+    "classification_report_text": "              precision    recall  f1-score   support\n\n         yes       1.00      1.00      1.00         1\n\n    accuracy                           1.00         1\n   macro avg       1.00      1.00      1.00         1\nweighted avg       1.00      1.00      1.00         1\n",
+    "confusion_matrix": [
+      [
+        1
+      ]
+    ],
+    "labels": [
+      "yes"
+    ],
+    "n_examples": 1
+  }
+}
