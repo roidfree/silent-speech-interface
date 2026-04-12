@@ -20,6 +20,7 @@ results/models/
 # Large local datasets
 data/
 SSI-jayla/
+SSI-Maks/
 
 # Mat files maybe large
 *.mat
